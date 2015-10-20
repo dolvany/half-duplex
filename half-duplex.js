@@ -51,29 +51,46 @@ function getName (host) {
 function filterName (name,host) {
     if (responsiveNames.indexOf(name) == -1) {
         responsiveNames.push(name);
-        getDuplex(name.split('.')[0],host);
+        getIntStatus(name.split('.')[0],host);
     }
 }
-function getDuplex (name,host) {
+function getIntStatus (name,host) {
     ++cbCount;
-    session.getSubtree({ host: host, oid: [1,3,6,1,2,1,10,7,2,1,19] }, function (error, varbinds) {
+    session.getSubtree({ host: host, oid: [1,3,6,1,2,1,2,2,1,8] }, function (error, varbinds) {
         --cbCount;
         if (error) {
             console.log('Fail :(');
         } else {
             varbinds.forEach(function (vb) {
-                filterDuplex(name,host,vb.oid.pop(),vb.value)
+                filterIntStatus(name,host,vb.oid.pop(),vb.value)
             });
+        }
+        emailReport();
+    });
+}
+function filterIntStatus (name,host,ifIndex,intStatus) {
+    if (intStatus == 1) {
+        getDuplex(name,host,ifIndex)
+    }
+}
+function getDuplex (name,host,ifIndex) {
+    ++cbCount;
+    session.get({ host: host, oid: [1,3,6,1,2,1,10,7,2,1,19,ifIndex] }, function (error, varbinds) {
+        --cbCount;
+        if (error) {
+            console.log('Fail :(');
+        } else {
+            filterDuplex(name,host,ifIndex,varbinds[0].value);
         }
         emailReport();
     });
 }
 function filterDuplex (name,host,ifIndex,duplex) {
     if (duplex==2) {
-        getIntDetails(name,host,ifIndex,duplex);
+        getIntDetails(name,host,ifIndex);
     }
 }
-function getIntDetails (name,host,ifIndex,duplex) {
+function getIntDetails (name,host,ifIndex) {
     ++cbCount;
     session.getAll({ host: host, oids: [[1,3,6,1,2,1,31,1,1,1,1,ifIndex],[1,3,6,1,2,1,31,1,1,1,18,ifIndex]] }, function (error, varbinds) {
         --cbCount;
