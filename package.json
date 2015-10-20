@@ -1,0 +1,31 @@
+{
+  "name": "half-duplex",
+  "description": "Email a report of all half-duplex ethernet interfaces in your network.",
+  "author": "Dennis Olvany <dennisolvany@gmail.com>",
+  "keywords": [
+    "snmp",
+    "ethernet",
+    "network",
+    "monitoring"
+  ],
+  "homepage": "https://github.com/dolvany/half-duplex",
+  "version": "0.0.1",
+  "main": "./half-duplex.js",
+  "scripts": {
+    "start": "node ./half-duplex.js"
+  },
+  "dependencies": {
+    "snmp-native": "~1.0.18",
+    "ip": "~1.0.1",
+    "ip-regex": "~1.0.3",
+    "smtp-connection": "~1.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dolvany/half-duplex.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dolvany/half-duplex/issues",
+    "email": "dennisolvany@gmail.com"
+  }
+}
