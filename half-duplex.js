@@ -11,7 +11,9 @@ var session = new snmp.Session({ community: community });
 var responsiveHosts = [];
 var responsiveNames = [];
 var cbCount = 0;
-var duplexReport = 'From: '+emailFrom+'\r\nTo: '+emailTo+'\r\nSubject: Half Duplex Report\r\n\r\n';
+var halfDuplexTotal = 0;
+var duplexReportBody = '';
+var duplexReportHeader = '';
 var SMTPConnection = require('smtp-connection');
 var connection = new SMTPConnection({host: smtpServer});
 
@@ -51,42 +53,42 @@ function getName (host) {
 function filterName (name,host) {
     if (responsiveNames.indexOf(name) == -1) {
         responsiveNames.push(name);
-        getIntStatus(name.split('.')[0],host);
+        getDuplex(name.split('.')[0],host);
     }
 }
-function getIntStatus (name,host) {
+function getDuplex (name,host) {
     ++cbCount;
-    session.getSubtree({ host: host, oid: [1,3,6,1,2,1,2,2,1,8] }, function (error, varbinds) {
+    session.getSubtree({ host: host, oid: [1,3,6,1,2,1,10,7,2,1,19] }, function (error, varbinds) {
         --cbCount;
         if (error) {
             console.log('Fail :(');
         } else {
             varbinds.forEach(function (vb) {
-                filterIntStatus(name,host,vb.oid.pop(),vb.value)
+                filterDuplex(name,host,vb.oid.pop(),vb.value)
             });
         }
         emailReport();
     });
 }
-function filterIntStatus (name,host,ifIndex,intStatus) {
-    if (intStatus == 1) {
-        getDuplex(name,host,ifIndex)
+function filterDuplex (name,host,ifIndex,duplex) {
+    if (duplex == 2) {
+        getIntStatus(name,host,ifIndex)
     }
 }
-function getDuplex (name,host,ifIndex) {
+function getIntStatus (name,host,ifIndex) {
     ++cbCount;
-    session.get({ host: host, oid: [1,3,6,1,2,1,10,7,2,1,19,ifIndex] }, function (error, varbinds) {
+    session.get({ host: host, oid: [1,3,6,1,2,1,2,2,1,8,ifIndex] }, function (error, varbinds) {
         --cbCount;
         if (error) {
             console.log('Fail :(');
         } else {
-            filterDuplex(name,host,ifIndex,varbinds[0].value);
+            filterIntStatus(name,host,ifIndex,varbinds[0].value);
         }
         emailReport();
     });
 }
-function filterDuplex (name,host,ifIndex,duplex) {
-    if (duplex==2) {
+function filterIntStatus (name,host,ifIndex,intStatus) {
+    if (intStatus==1) {
         getIntDetails(name,host,ifIndex);
     }
 }
@@ -97,15 +99,17 @@ function getIntDetails (name,host,ifIndex) {
         if (error) {
             console.log('Fail :(');
         } else {
-            duplexReport += name+' '+varbinds[0].value+' '+varbinds[1].value+'\r\n';
+            duplexReportBody += name+' '+varbinds[0].value+' '+varbinds[1].value+'\r\n';
+            ++halfDuplexTotal;
         }
         emailReport();
     });
 }
 function emailReport () {
     if (cbCount===0) {
+        duplexReportHeader = 'From: '+emailFrom+'\r\nTo: '+emailTo+'\r\nSubject: '+halfDuplexTotal+' Half Duplex Interfaces\r\n\r\n';
         connection.connect(function () {
-            connection.send({from: emailFrom, to:emailTo}, duplexReport, function () {
+            connection.send({from: emailFrom, to:emailTo}, duplexReportHeader+duplexReportBody, function () {
                 connection.quit();
                 session.close();
                 process.exit();
