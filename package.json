@@ -9,7 +9,7 @@
     "monitoring"
   ],
   "homepage": "https://github.com/dolvany/half-duplex",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "./half-duplex.js",
   "scripts": {
     "start": "node ./half-duplex.js"

@@ -8,8 +8,8 @@ var snmp = require('snmp-native');
 var ip = require('ip');
 var ipRegex = require('ip-regex');
 var session = new snmp.Session({ community: community });
-var responsiveHosts = [];
-var responsiveNames = [];
+var polledHosts = [];
+var uniqueHosts = [];
 var cbCount = 0;
 var halfDuplexTotal = 0;
 var duplexReportBody = '';
@@ -18,19 +18,19 @@ var SMTPConnection = require('smtp-connection');
 var connection = new SMTPConnection({host: smtpServer});
 
 function filterHost (host) {
-    if(responsiveHosts.indexOf(host) == -1 && ipRegex({exact: true}).test(host)){
+    if(polledHosts.indexOf(host) == -1 && ipRegex({exact: true}).test(host)){
         getNeighbors(host);
-        getName(host);
     }
 }
 function getNeighbors (host) {
     ++cbCount;
     session.getSubtree({ host: host, oid: [1,3,6,1,4,1,9,9,23,1,2,1,1,4] }, function (error, varbinds) {
         --cbCount;
+        polledHosts.push(host);
         if (error) {
             console.log('Fail :(');
         } else {
-            responsiveHosts.push(host);
+            getName(host);
             varbinds.forEach(function (vb) {
                 filterHost(ip.toString(vb.valueRaw));
             });
@@ -51,8 +51,8 @@ function getName (host) {
     });
 }
 function filterName (name,host) {
-    if (responsiveNames.indexOf(name) == -1) {
-        responsiveNames.push(name);
+    if (uniqueHosts.indexOf(name) == -1) {
+        uniqueHosts.push(name);
         getDuplex(name.split('.')[0],host);
     }
 }
