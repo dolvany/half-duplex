@@ -19,6 +19,7 @@ var connection = new SMTPConnection({host: smtpServer});
 
 function filterHost (host) {
     if(polledHosts.indexOf(host) == -1 && ipRegex({exact: true}).test(host)){
+        polledHosts.push(host);
         getNeighbors(host);
     }
 }
@@ -26,7 +27,6 @@ function getNeighbors (host) {
     ++cbCount;
     session.getSubtree({ host: host, oid: [1,3,6,1,4,1,9,9,23,1,2,1,1,4] }, function (error, varbinds) {
         --cbCount;
-        polledHosts.push(host);
         if (error) {
             console.log('Fail :(');
         } else {
