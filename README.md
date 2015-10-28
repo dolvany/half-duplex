@@ -14,11 +14,11 @@ emailTo: Email to address.
 
 # usage
 
-cd c:\pathto\half-duplex
+cd c:\pathto\half-duplex  
 npm start
 
 # windows task scheduling
 
-program: npm
-arguments: start
+program: npm  
+arguments: start  
 start in: c:\pathto\half-duplex
