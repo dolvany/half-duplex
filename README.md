@@ -6,10 +6,10 @@ Node.js program that crawls your Cisco network using CDP and finds all of your h
 
 Configure parameters in config.js as follows.
 
-seedDevices: One device per CDP island.
-community: SNMPv2c community string.
-smtpServer: SMTP relay accessible to the host.
-emailFrom: Email from address.
+seedDevices: One device per CDP island.  
+community: SNMPv2c community string.  
+smtpServer: SMTP relay accessible to the host.  
+emailFrom: Email from address.  
 emailTo: Email to address.
 
 # usage
