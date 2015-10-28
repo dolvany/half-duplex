@@ -1,6 +1,6 @@
 {
   "name": "half-duplex",
-  "description": "Email a report of all half-duplex ethernet interfaces in your network.",
+  "description": "Find your speed/duplex mismatches.",
   "author": "Dennis Olvany <dennisolvany@gmail.com>",
   "license": "MIT",
   "keywords": [
