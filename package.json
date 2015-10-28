@@ -2,6 +2,7 @@
   "name": "half-duplex",
   "description": "Email a report of all half-duplex ethernet interfaces in your network.",
   "author": "Dennis Olvany <dennisolvany@gmail.com>",
+  "license": "MIT",
   "keywords": [
     "snmp",
     "ethernet",
