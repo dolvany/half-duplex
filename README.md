@@ -2,6 +2,10 @@
 
 Node.js program that crawls a Cisco network using CDP and finds all of the half-duplex ethernet interfaces. The goal is the discovery of speed/duplex mismatches. Sends the result via email.
 
+# install
+
+npm install half-duplex
+
 # configure
 
 Configure parameters in config.js as follows.
