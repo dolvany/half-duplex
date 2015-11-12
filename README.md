@@ -15,7 +15,7 @@ seedDevices: One device per CDP island.
 community: SNMPv2c community string.  
 smtpServer: SMTP relay accessible to the host.  
 emailFrom: Email from address.  
-emailTo: Email to address.
+emailTo: Email to address.  
 ignoreDevices: Exclude devices from polling.
 
 # usage
