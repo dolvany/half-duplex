@@ -4,6 +4,7 @@ Node.js program that crawls a Cisco network using CDP and finds all of the half-
 
 # install
 
+install [node.js](https://nodejs.org/)  
 npm install half-duplex
 
 # configure
