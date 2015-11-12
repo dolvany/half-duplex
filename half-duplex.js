@@ -3,11 +3,13 @@ var snmp = require('snmp-native');
 var ip = require('ip');
 var ipRegex = require('ip-regex');
 var session = new snmp.Session({ community: config.community });
-var polledHosts = [];
+var polledHosts = config.ignoreDevices;
+var pollingFailed = [];
+var pollingSucceeded = [];
 var uniqueHosts = [];
 var cbCount = 0;
 var halfDuplexTotal = 0;
-var duplexReportBody = '';
+var duplexReportBody = [];
 var duplexReportHeader = '';
 var SMTPConnection = require('smtp-connection');
 var connection = new SMTPConnection({host: config.smtpServer});
@@ -22,6 +24,9 @@ function getNeighbors (host) {
     ++cbCount;
     session.getSubtree({ host: host, oid: [1,3,6,1,4,1,9,9,23,1,2,1,1,4] }, function (error, varbinds) {
         if (error) {
+            if (pollingFailed.indexOf(host) == -1) {
+                pollingFailed.push(host);
+            }
             console.log('Fail :(');
         } else {
             getName(host);
@@ -46,6 +51,7 @@ function getName (host) {
 function filterName (name,host) {
     if (uniqueHosts.indexOf(name) == -1) {
         uniqueHosts.push(name);
+        pollingSucceeded.push(name.split('.')[0]);
         getDuplex(name.split('.')[0],host);
     }
 }
@@ -89,7 +95,7 @@ function getIntDetails (name,host,ifIndex) {
         if (error) {
             console.log('Fail :(');
         } else {
-            duplexReportBody += name+' '+varbinds[0].value+' '+varbinds[1].value+'\r\n';
+            duplexReportBody.push( name+' '+varbinds[0].value+' '+varbinds[1].value );
             ++halfDuplexTotal;
         }
         countdown();
@@ -97,9 +103,10 @@ function getIntDetails (name,host,ifIndex) {
 }
 function countdown () {
     if (--cbCount===0) {
-        duplexReportHeader = 'From: '+config.emailFrom+'\r\nTo: '+config.emailTo+'\r\nSubject: '+halfDuplexTotal+' Half Duplex Interfaces\r\n\r\n';
+        duplexReportHeader = 'From: '+config.emailFrom+'\r\nTo: '+config.emailTo+'\r\nSubject: '+halfDuplexTotal+' Half Duplex Interfaces\r\n\r\nHalf Duplex Interfaces:\r\n';
+        duplexReportFooter = '\r\n\r\nPolling failed:\r\n' + pollingFailed.sort().join('\r\n') + '\r\n\r\nPolling succeeded:\r\n' + pollingSucceeded.sort().join('\r\n');
         connection.connect(function () {
-            connection.send({from: config.emailFrom, to:config.emailTo}, duplexReportHeader+duplexReportBody, function () {
+            connection.send({from: config.emailFrom, to:config.emailTo}, duplexReportHeader+duplexReportBody.sort().join('\r\n')+duplexReportFooter, function () {
                 connection.quit();
                 session.close();
                 process.exit();
