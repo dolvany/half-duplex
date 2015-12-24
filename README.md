@@ -4,20 +4,20 @@ Node.js program that crawls a Cisco network using CDP and finds all of the half-
 
 # install
 
-1. install [node.js](https://nodejs.org/)
-2. install half-duplex
+- install [node.js](https://nodejs.org/)
+- install half-duplex
 ```
 npm install half-duplex
 ```
 
 # configure
 
-1. Rename config file.
+- Rename config file.
 ```
 ren config.js.example config.js
 ```
 
-2. Configure parameters in config.js as follows.
+- Configure parameters in config.js as follows.
 
 seedDevices: One device per CDP island.  
 community: SNMPv2c community string.  
