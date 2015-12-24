@@ -5,9 +5,11 @@ Node.js program that crawls a Cisco network using CDP and finds all of the half-
 # install
 
 install [node.js](https://nodejs.org/)  
-npm install half-duplex
+  npm install half-duplex
 
 # configure
+
+  ren config.js.example config.js
 
 Configure parameters in config.js as follows.
 
@@ -20,8 +22,8 @@ ignoreDevices: Exclude devices from polling.
 
 # usage
 
-cd c:\pathto\half-duplex  
-npm start
+  cd c:\pathto\half-duplex  
+  npm start
 
 # windows task scheduling
 
